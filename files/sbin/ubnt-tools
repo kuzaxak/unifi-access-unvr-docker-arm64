@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "${1:-}" = 'id' ]; then
+emit_id() {
     if [ ! -f /data/uuid.txt ]; then
         cat /proc/sys/kernel/random/uuid > /data/uuid.txt
     fi
@@ -61,6 +61,14 @@ if [ "${1:-}" = 'id' ]; then
     echo "board.hwrev=1"
     echo "board.serialno=${serial}"
     echo "board.qrid=sTpBUR"
+}
+
+if [ "${1:-}" = 'id' ]; then
+    if [ -n "${2:-}" ]; then
+        emit_id > "$2"
+    else
+        emit_id
+    fi
     exit 0
 fi
 
