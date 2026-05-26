@@ -1,0 +1,12 @@
+[Unit]
+Description=Install UniFi Access nginx route
+After=unifi-core.service nginx.service
+Wants=unifi-core.service nginx.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/install_unifi_access_route.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

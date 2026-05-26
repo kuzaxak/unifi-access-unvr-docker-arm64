@@ -1,0 +1,30 @@
+#!/bin/bash
+
+source /etc/default/storage_disk 2>/dev/null || true
+disk="${STORAGE_DISK:-/dev/sda1}"
+
+if [ "${1:-}" = "$disk" ] || [ "${2:-}" = "$disk" ] || [ "${3:-}" = "$disk" ]; then
+    cat <<EOT
+smartctl 7.2 2020-12-30 r5155 [x86_64-linux-5.10.0-8-amd64] (local build)
+Copyright (C) 2002-20, Bruce Allen, Christian Franke, www.smartmontools.org
+
+=== START OF INFORMATION SECTION ===
+Device Model:     WD82PURZ-85TEUY0
+Serial Number:    WD-WX62D313TEZ3
+LU WWN Device Id: 5 000039 fe6eb1ec3
+Firmware Version: 81.00B81
+User Capacity:    8,001,574,060,032 bytes [8.00 TB]
+Sector Sizes:     512 bytes logical, 4096 bytes physical
+Rotation Rate:    5400 rpm
+Form Factor:      3.5 inches
+Device is:        In smartctl database [for details use: -P show]
+ATA Version is:   ATA8-ACS T13/1699-D revision 4
+SATA Version is:  SATA 3.0, 6.0 Gb/s (current: 6.0 Gb/s)
+Local Time is:    Sat Jun  3 19:16:20 2023 BST
+SMART support is: Available - device has SMART capability.
+SMART support is: Enabled
+
+=== START OF READ SMART DATA SECTION ===
+SMART overall-health self-assessment test result: PASSED
+EOT
+fi

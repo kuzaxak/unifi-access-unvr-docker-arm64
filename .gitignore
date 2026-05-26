@@ -1,0 +1,11 @@
+.DS_Store
+.scratch/
+dist/
+storage/
+firmware/
+firmware.*/
+*.deb
+*.bin
+*.tar
+*.tar.gz
+*.pcap

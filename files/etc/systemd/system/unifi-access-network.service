@@ -1,0 +1,8 @@
+[Unit]
+Description=Configure UniFi Access device network
+After=unifi-access.service
+Wants=unifi-access.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/configure_unifi_access_network.sh

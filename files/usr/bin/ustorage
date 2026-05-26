@@ -1,0 +1,88 @@
+#!/bin/bash
+# unifi-core calls /usr/bin/ustorage to inspect disk + space + raid config.
+# Without this shim the setup wizard fails with gRPC ECONNREFUSED on 11052.
+# Pairs with the service.js sed patch that forces unifi-core down this code path.
+
+source /etc/default/storage_disk 2>/dev/null || true
+disk="${STORAGE_DISK:-/dev/sda1}"
+device=$(basename "${disk}")
+sbytes=$(df -B1 --output=size /srv 2>/dev/null | awk 'NR==2 {print $1}')
+sused=$(df -B1 --output=used /srv 2>/dev/null | awk 'NR==2 {print $1}')
+
+case "${1:-}" in
+    disk)
+        if [ "${2:-}" = 'inspect' ]; then
+            cat <<EOT
+[
+    {
+        "action": "none",
+        "ata": "ATA8-ACS",
+        "bad_sector": 0,
+        "error_log_count": 0,
+        "estimate": null,
+        "firmware": "AX001Q",
+        "healthy": "good",
+        "life_span": 100,
+        "model": "UniFi Access cloud disk",
+        "poweronhrs": 1,
+        "progress": null,
+        "read_error": 0,
+        "reason": null,
+        "rpm": 5400,
+        "sata": "SATA 3",
+        "serial": "X0JNP396T",
+        "size": ${sbytes},
+        "slot": 1,
+        "smart_error_count": 0,
+        "state": "normal",
+        "temperature": 49,
+        "threshold": 10,
+        "type": "HDD",
+        "unc_count": 0
+    }
+]
+EOT
+        fi
+    ;;
+    space)
+        if [ "${2:-}" = 'inspect' ]; then
+            cat <<EOT
+[
+    {
+        "action": "none",
+        "device": "${device}",
+        "errors_count": 0,
+        "estimate": 0,
+        "health": "health",
+        "progress": null,
+        "raid": null,
+        "reasons": [],
+        "resv_bytes": 0,
+        "space_type": "primary",
+        "total_bytes": ${sbytes},
+        "used_bytes": ${sused}
+    }
+]
+EOT
+        fi
+    ;;
+    config)
+        if [ "${2:-}" = 'show' ]; then
+            cat <<EOT
+{
+    "hotspare": false,
+    "raid": "raid1"
+}
+EOT
+        fi
+    ;;
+    rwfs)
+        if [ "${2:-}" = 'check' ]; then
+            cat <<EOT
+{
+    "isMigrated": false,
+    "migratable": {"canMigrate": false, "reason": "not-support"}
+}
+EOT
+        fi
+esac

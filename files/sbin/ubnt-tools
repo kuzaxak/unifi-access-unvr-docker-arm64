@@ -1,0 +1,67 @@
+#!/bin/bash
+
+if [ "${1:-}" = 'id' ]; then
+    if [ ! -f /data/uuid.txt ]; then
+        cat /proc/sys/kernel/random/uuid > /data/uuid.txt
+    fi
+    uuid=$(cat /data/uuid.txt)
+    iface=$(ip route get 8.8.8.8 2>/dev/null | grep -Po '(?<=(dev ))(\S+)' | head -n1)
+    serial=$(cat /sys/class/net/${iface:-lo}/address 2>/dev/null | sed 's/://g')
+    serial=${serial:-000000000000}
+
+    if [ -f /etc/default/device ]; then
+        DEVICE="$(tr -d '\n' < /etc/default/device)"
+    fi
+    case "${DEVICE:-UNVR}" in
+        # Access-capable consoles. Listed here so DEVICE=<name> can pivot the
+        # identity Access sees. Whether Access actually accepts a given sysid
+        # is empirical - leave UNVR as default until validated.
+        'UCG_MAX')
+            echo "board.sysid=0xa69a"
+            echo "board.name=UniFi Cloud Gateway Max"
+            echo "board.shortname=UCGMAX";;
+        'UCG_FIBER')
+            echo "board.sysid=0xa6a8"
+            echo "board.name=UniFi Cloud Gateway Fiber"
+            echo "board.shortname=UCGFIBER";;
+        'UDM_PRO_MAX')
+            echo "board.sysid=0xea36"
+            echo "board.name=UniFi Dream Machine Pro Max"
+            echo "board.shortname=UDMPROMAX";;
+        'UDM_PRO')
+            echo "board.sysid=0xea15"
+            echo "board.name=UniFi Dream Machine Pro"
+            echo "board.shortname=UDMPRO";;
+        'UDM_SE')
+            echo "board.sysid=0xea13"
+            echo "board.name=UniFi Dream Machine SE"
+            echo "board.shortname=UDMSE";;
+        # UNVR family - same identity Protect uses. Default fallback; works
+        # for booting unifi-core even though UNVR is not an Access console.
+        'UNVR_PRO')
+            echo "board.sysid=0xea20"
+            echo "board.name=UniFi Network Video Recorder Pro"
+            echo "board.shortname=UNVRPRO";;
+        'ENVR')
+            echo "board.sysid=0xea3f"
+            echo "board.name=UniFi Enterprise Network Video Recorder"
+            echo "board.shortname=ENVR";;
+        *)
+            echo "board.sysid=0xea16"
+            echo "board.name=UniFi Network Video Recorder"
+            echo "board.shortname=UNVR";;
+    esac
+
+    echo "board.subtype="
+    echo "board.reboot=30"
+    echo "board.upgrade=310"
+    echo "board.cpu.id=00000000-00000000"
+    echo "board.uuid=${uuid}"
+    echo "board.bom=1"
+    echo "board.hwrev=1"
+    echo "board.serialno=${serial}"
+    echo "board.qrid=sTpBUR"
+    exit 0
+fi
+
+exec /sbin/ubnt-tools.orig "$@"

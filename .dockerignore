@@ -1,0 +1,16 @@
+.git
+.DS_Store
+.scratch
+dist
+storage
+firmware
+firmware.*
+docker-compose*.yml
+README.md
+CHANGELOG.md
+*.md
+*.deb
+*.bin
+*.tar
+*.tar.gz
+*.pcap

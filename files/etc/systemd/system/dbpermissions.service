@@ -1,0 +1,12 @@
+[Unit]
+Description=Set database permissions
+Before=postgresql.service postgresql@14-main.service postgresql-cluster@14-main.service postgresql-cluster-14-main-upgrade.service postgresql-cluster-14-access-upgrade.service
+After=local-fs.target sysinit.target
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/patch_db.sh
+
+[Install]
+WantedBy=postgresql.service postgresql-cluster-14-main-upgrade.service postgresql-cluster-14-access-upgrade.service

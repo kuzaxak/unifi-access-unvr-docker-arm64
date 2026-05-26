@@ -1,0 +1,11 @@
+[Unit]
+Description=Re-apply UniFi Access device network settings
+
+[Timer]
+OnBootSec=20s
+OnUnitActiveSec=1min
+AccuracySec=10s
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,61 @@
+services:
+  unifi-os:
+    image: unifi-os-docker-arm64:stable
+    tty: true
+    hostname: UNVR
+    extra_hosts:
+      - "UNVR:127.0.1.1"
+    container_name: unifi-os
+    stop_grace_period: 2m
+    volumes:
+      - storage-srv:/srv
+      - storage-data:/data
+      - storage-persistent:/persistent
+    environment:
+      - container=docker
+      - DEVICE=UNVR
+      - DEBUG=false
+    restart: unless-stopped
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+      - /var/run
+      - /var/run/lock
+    privileged: true
+    # WARNING: macOS Docker Desktop cannot adopt real Access doors or Protect
+    # cameras. Docker Desktop runs the container inside a VM with NAT - UDP
+    # 10001 broadcasts (Access discovery) and ONVIF/mDNS (Protect discovery)
+    # from devices on your LAN do not reach the container, and there is no
+    # `set-inform` CLI override for these device families. This compose is
+    # useful only for: (a) verifying the image builds, (b) accessing the web
+    # UI for setup/exploration, (c) lab work without physical devices. For
+    # real deployment use docker-compose.yml on a Linux host with
+    # network_mode: host, or a Debian VM with a bridged network adapter.
+    ports:
+      - "80:80/tcp"
+      - "443:443/tcp"
+      - "8080:8080/tcp"
+      # Access UI / API surface
+      - "12080:12080/tcp"
+      - "12442:12442/tcp"
+      - "12443:12443/tcp"
+      - "12445:12445/tcp"
+      - "12812:12812/tcp"
+      # Protect UI / API surface
+      - "7080:7080/tcp"
+      - "7442:7442/tcp"
+      - "7445:7445/tcp"
+      - "7446:7446/tcp"
+      - "7447:7447/tcp"
+      - "7550:7550/tcp"
+      - "7451:7451/tcp"
+      - "7704:7704/tcp"
+      # coturn STUN/TURN (Access intercom + Protect WebRTC)
+      - "3478:3478/udp"
+      - "12478:12478/udp"
+
+volumes:
+  storage-srv:
+  storage-data:
+  storage-persistent:
